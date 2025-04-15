@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestion des Palettes</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 10px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .box {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px; /* Pour éviter le zoom sur iOS */
+        }
+        input[type="number"] {
+            text-align: center;
+            width: 80px;
+        }
+        button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        button.secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        button.success {
+            background-color: #0f9d58;
+        }
+        button.danger {
+            background-color: #db4437;
+        }
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .error {
+            background-color: #fbe9e7;
+            color: #c62828;
+        }
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .user-info button {
+            width: auto;
+            margin: 0;
+            padding: 8px 12px;
+        }
+        .item {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+            margin-bottom: 10px;
+            background-color: #fafafa;
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .item-title {
+            font-weight: bold;
+        }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .product-info {
+            flex: 1;
+        }
+        .product-code {
+            font-weight: bold;
+        }
+        .product-name {
+            color: #666;
+            font-size: 14px;
+        }
+        .users-list {
+            margin-top: 15px;
+        }
+        .user-item {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .admin-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .admin-link button {
+            background: none;
+            color: #4285f4;
+            padding: 5px;
+            text-decoration: underline;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gestion des Palettes</h1>
+        
+        <!-- Message de notification -->
+        <div id="messageBox" class="message hidden"></div>
+        
+        <!-- Section de connexion -->
+        <div id="loginSection" class="box">
+            <h2>Connexion</h2>
+            <label for="loginInput">Identifiant:</label>
+            <input type="text" id="loginInput" placeholder="Entrez votre nom ou matricule">
+            <button id="loginButton">Se connecter</button>
+            
+            <div class="users-list">
+                <h3>Utilisateurs disponibles:</h3>
+                <div class="user-item">✓ Martin Dupont (MD001) - Atelier Palette Neuve</div>
+                <div class="user-item">✓ Sophie Leroy (SL002) - Atelier Réparation</div>
+                <div class="user-item">✓ Jean Blanc (JB003) - Atelier Palette Verte</div>
+            </div>
+            
+            <div class="admin-link">
+                <button id="adminButton">Connexion administrateur</button>
+            </div>
+            
+            <div id="adminLoginBox" class="hidden" style="margin-top: 15px; padding: 10px; background: #f8f8f8; border-radius: 6px;">
+                <label for="adminPassword">Mot de passe admin:</label>
+                <input type="password" id="adminPassword">
+                <button id="adminLoginButton">Connexion</button>
+            </div>
+        </div>
+        
+        <!-- Section Utilisateur -->
+        <div id="userSection" class="hidden">
+            <div class="box">
+                <div class="user-info">
+                    <div>
+                        <h2 id="groupName"></h2>
+                        <div id="userName"></div>
+                    </div>
+                    <button id="logoutButton" class="danger">Déconnexion</button>
+                </div>
+                
+                <h3>Saisie des quantités:</h3>
+                <div id="productsContainer"></div>
+                
+                <button id="saveButton" class="success">Enregistrer</button>
+            </div>
+            
+            <div class="box">
+                <button id="toggleEntriesButton">Afficher mes enregistrements</button>
+                
+                <div id="entriesSection" class="hidden" style="margin-top: 15px;">
+                    <h3>Mes enregistrements:</h3>
+                    <div id="entriesList">
+                        <p>Aucun enregistrement trouvé.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section Admin -->
+        <div id="adminSection" class="hidden">
+            <div class="box">
+                <div class="user-info">
+                    <h2>Administration</h2>
+                    <button id="adminLogoutButton" class="danger">Déconnexion</button>
+                </div>
+                
+                <h3>Tous les enregistrements:</h3>
+                <div id="adminEntriesList">
+                    <p>Aucun enregistrement trouvé.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données
+        const users = [
+            { id: 1, name: "Martin Dupont", matricule: "MD001", groupId: 1 },
+            { id: 2, name: "Sophie Leroy", matricule: "SL002", groupId: 2 },
+            { id: 3, name: "Jean Blanc", matricule: "JB003", groupId: 3 }
+        ];
+        
+        const groups = [
+            { id: 1, name: "Atelier Palette Neuve" },
+            { id: 2, name: "Atelier Réparation" },
+            { id: 3, name: "Atelier Palette Verte" }
+        ];
+        
+        const products = [
+            { id: 1, code: "080120", name: "Palette 80 x 120 Neuve", groupId: 1 },
+            { id: 2, code: "128178", name: "Palette 128 x 178 Neuve", groupId: 1 },
+            { id: 3, code: "001", name: "Palette Europe", groupId: 2 },
+            { id: 4, code: "002", name: "Palette Demi Lourde", groupId: 2 },
+            { id: 5, code: "06080", name: "Palette 60 x 80 Verte", groupId: 3 },
+            { id: 6, code: "07840", name: "Palette 78 x 40 Verte", groupId: 3 }
+        ];
+        
+        // État de l'application
+        let entries = [];
+        let currentUser = null;
+        let isAdmin = false;
+        
+        // Fonctions
+        function showMessage(text, isError = false) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = text;
+            messageBox.className = `message ${isError ? 'error' : 'success'}`;
+            
+            setTimeout(() => {
+                messageBox.className = 'message hidden';
+            }, 3000);
+        }
+        
+        function handleLogin() {
+            const loginInput = document.getElementById('loginInput').value.trim();
+            
+            if (!loginInput) {
+                showMessage('Veuillez entrer un identifiant', true);
+                return;
+            }
+            
+            const user = users.find(u => 
+                u.name.toLowerCase() === loginInput.toLowerCase() || 
+                u.matricule.toLowerCase() === loginInput.toLowerCase()
+            );
+            
+            if (user) {
+                currentUser = user;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('userSection').classList.remove('hidden');
+                
+                const group = groups.find(g => g.id === user.groupId);
+                document.getElementById('groupName').textContent = group.name;
+                document.getElementById('userName').textContent = `${user.name} (${user.matricule})`;
+                
+                loadProducts();
+                showMessage(`Bienvenue ${user.name}`);
+            } else {
+                showMessage('Utilisateur non trouvé', true);
+            }
+        }
+        
+        function handleAdminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === 'admin123') {
+                isAdmin = true;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('adminSection').classList.remove('hidden');
+                updateAdminEntries();
+                showMessage('Connexion administrateur réussie');
+            } else {
+                showMessage('Mot de passe incorrect', true);
+            }
+        }
+        
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('userSection').classList.add('hidden');
+            document.getElementById('adminSection').classList.add('hidden');
+            document.getElementById('entriesSection').classList.add('hidden');
+            document.getElementById('adminLoginBox').classList.add('hidden');
+            
+            document.getElementById('loginInput').value = '';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('toggleEntriesButton').textContent = 'Afficher mes enregistrements';
+        }
+        
+        function loadProducts() {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = '';
+            
+            const groupProducts = products.filter(p => p.groupId === currentUser.groupId);
+            
+            groupProducts.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                
+                const productInfo = document.createElement('div');
+                productInfo.className = 'product-info';
+                
+                const productCode = document.createElement('div');
+                productCode.className = 'product-code';
+                productCode.textContent = product.code;
+                
+                const productName = document.createElement('div');
+                productName.className = 'product-name';
+                productName.textContent = product.name;
+                
+                productInfo.appendChild(productCode);
+                productInfo.appendChild(productName);
+                
+                const quantityInput = document.createElement('input');
+                quantityInput.type = 'number';
+                quantityInput.min = '0';
+                quantityInput.value = '0';
+                quantityInput.id = `quantity-${product.id}`;
+                
+                productItem.appendChild(productInfo);
+                productItem.appendChild(quantityInput);
+                
+                container.appendChild(productItem);
+            });
+        }
+        
+        function saveData() {
+            const groupProducts = products.filter(p => p.groupId === currentUser.groupId);
+            let hasEntries = false;
+            
+            groupProducts.forEach(product => {
+                const input = document.getElementById(`quantity-${product.id}`);
+                const quantity = parseInt(input.value) || 0;
+                
+                if (quantity > 0) {
+                    hasEntries = true;
+                    
+                    entries.push({
+                        id: entries.length + 1,
+                        timestamp: new Date().toISOString(),
+                        userId: currentUser.id,
+                        userName: currentUser.name,
+                        userMatricule: currentUser.matricule,
+                        groupId: currentUser.groupId,
+                        groupName: groups.find(g => g.id === currentUser.groupId).name,
+                        productId: product.id,
+                        productCode: product.code,
+                        productName: product.name,
+                        quantity: quantity
+                    });
+                    
+                    input.value = '0';
+                }
+            });
+            
+            if (hasEntries) {
+                showMessage('Données enregistrées avec succès');
+                updateUserEntries();
+                updateAdminEntries();
+            } else {
+                showMessage('Veuillez saisir au moins une quantité', true);
+            }
+        }
+        
+        function toggleEntries() {
+            const entriesSection = document.getElementById('entriesSection');
+            const toggleButton = document.getElementById('toggleEntriesButton');
+            
+            if (entriesSection.classList.contains('hidden')) {
+                entriesSection.classList.remove('hidden');
+                toggleButton.textContent = 'Masquer mes enregistrements';
+                updateUserEntries();
+            } else {
+                entriesSection.classList.add('hidden');
+                toggleButton.textContent = 'Afficher mes enregistrements';
+            }
+        }
+        
+        function updateUserEntries() {
+            const entriesList = document.getElementById('entriesList');
+            const userEntries = entries
+                .filter(entry => entry.userId === currentUser.id)
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            if (userEntries.length === 0) {
+                entriesList.innerHTML = '<p>Aucun enregistrement trouvé.</p>';
+                return;
+            }
+            
+            entriesList.innerHTML = '';
+            
+            userEntries.forEach(entry => {
+                const entryItem = document.createElement('div');
+                entryItem.className = 'item';
+                
+                const date = new Date(entry.timestamp).toLocaleString();
+                
+                entryItem.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-title">${entry.productName} (${entry.productCode})</span>
+                        <span>Qté: ${entry.quantity}</span>
+                    </div>
+                    <div>${date}</div>
+                `;
+                
+                entriesList.appendChild(entryItem);
+            });
+        }
+        
+        function updateAdminEntries() {
+            if (!isAdmin) return;
+            
+            const adminEntriesList = document.getElementById('adminEntriesList');
+            
+            if (entries.length === 0) {
+                adminEntriesList.innerHTML = '<p>Aucun enregistrement trouvé.</p>';
+                return;
+            }
+            
+            adminEntriesList.innerHTML = '';
+            
+            // Trier par date décroissante
+            const sortedEntries = [...entries].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            sortedEntries.forEach(entry => {
+                const entryItem = document.createElement('div');
+                entryItem.className = 'item';
+                
+                const date = new Date(entry.timestamp).toLocaleString();
+                
+                entryItem.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-title">${entry.productName} (${entry.productCode})</span>
+                        <span>Qté: ${entry.quantity}</span>
+                    </div>
+                    <div>Utilisateur: ${entry.userName} (${entry.userMatricule})</div>
+                    <div>Groupe: ${entry.groupName}</div>
+                    <div>${date}</div>
+                `;
+                
+                adminEntriesList.appendChild(entryItem);
+            });
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Connexion utilisateur
+            document.getElementById('loginButton').addEventListener('click', handleLogin);
+            document.getElementById('loginInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+            
+            // Connexion admin
+            document.getElementById('adminButton').addEventListener('click', function() {
+                document.getElementById('adminLoginBox').classList.toggle('hidden');
+            });
+            document.getElementById('adminLoginButton').addEventListener('click', handleAdminLogin);
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleAdminLogin();
+                }
+            });
+            
+            // Gestion des données
+            document.getElementById('saveButton').addEventListener('click', saveData);
+            document.getElementById('toggleEntriesButton').addEventListener('click', toggleEntries);
+            
+            // Déconnexion
+            document.getElementById('logoutButton').addEventListener('click', logout);
+            document.getElementById('adminLogoutButton').addEventListener('click', logout);
+        });
+    </script>
+</body>
+</html>
